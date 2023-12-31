@@ -81,7 +81,8 @@ async function nepGetComponent(element) {
   let temp = element.getAttribute("n-theme")
   const theme = (nepThemes.hasOwnProperty(temp)) ? nepThemes[temp] : nepEmptyTheme
   const n_key = element.getAttribute("n-key")
-  const n_show_key = element.getAttribute("n-show-key")
+  temp = element.getAttribute("n-show-key")
+  const n_show_key = (temp) ? temp : "true"
   const n_update = element.getAttribute("n-update")
   const n_delete = element.getAttribute("n-delete")
   const n_pagination = element.getAttribute("n-pagination")
@@ -115,12 +116,12 @@ async function nepGetComponent(element) {
   if(res.rows.length) {
     const keys = Object.keys(res.rows[0])
     for(let i=0;i < keys.length;i++) {
-      if(n_show_key === "false" && keys[i] != n_key) {
-        let title_column = nepGetTitle(keys[i])
-        nepTableMetaData[tableId].titles.push(title_column)
-        nepTableMetaData[tableId].keys.push(keys[i])
-        title += `<th class="${theme.th}">${title_column}</th>`
-      }
+      if(n_show_key === "false" && keys[i] === n_key) continue
+      
+      let title_column = nepGetTitle(keys[i])
+      nepTableMetaData[tableId].titles.push(title_column)
+      nepTableMetaData[tableId].keys.push(keys[i])
+      title += `<th class="${theme.th}">${title_column}</th>`
     }
   }
 

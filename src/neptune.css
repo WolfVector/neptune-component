@@ -1,0 +1,368 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
+:root {
+    --font: "Roboto";
+    --font-weight: 500;
+}
+
+.n-table {
+    font-family: var(--font);
+    font-size: 16px; 
+	border-collapse: collapse;
+    width: 100%; 
+}
+
+.n-th {
+    text-align: left;
+    padding: 15px 6px;
+    font-weight: var(--font-weight);
+}
+
+.n-th-normal {
+	background: #3D3D3D;
+    color: white;
+}
+
+.n-th:first-child {
+	border-top-left-radius: 7px;
+}
+
+.n-th:last-child {
+    border-top-right-radius: 7px;
+}
+
+/* Animation when deleting row */
+.n-tr {
+    transition: transform 0.5s linear;
+}
+
+.n-tr-remove {
+    transform: translateX(100vw); 
+}
+/*******************************/
+
+.n-tr-normal:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.n-td {
+	padding: 12px;
+}
+
+.n-update-cursor:hover {
+    cursor: pointer;
+}
+
+.n-delete {
+    padding: 7px;
+    color: white;
+    border: 0px;
+    border-radius: 5px;
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+}
+
+.n-delete-normal {
+    background: rgb(227, 60, 60);
+}
+
+.n-delete:hover {
+    cursor: pointer;
+}
+
+.n-pages-div {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.n-pages {
+    padding: 12px;
+    font-size: 14px;
+    font-family: var(--font);
+}
+
+.n-pages:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.n-pages:hover {
+    cursor: pointer;
+}
+
+.n-pages-normal {
+    background: white;
+    color: #0d6efd;   
+    border: 1px solid #dee2e6;
+    border-right: 0px;
+}
+
+.n-pages-normal-active {
+    background: #0d6efd;
+    color: white;
+}
+
+.n-pages-normal:not(:last-child) {
+    border-right: 1px solid #ebedef;
+}
+
+.n-pages-normal:last-child {
+    border-right: 1px solid #dee2e6;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.n-pages-green {
+    color: #1dd5b0;
+}
+
+.n-pages-green-active {
+    background: #1dd5b0;
+    color: white;
+}
+
+.n-pages-black {
+    background: rgb(87, 87, 87);
+    color: white;
+    border: 1px solid #626161;
+    border-right: 0px;
+}
+
+.n-pages-black-active {
+    background: rgb(120, 119, 119);
+    color: white;
+}
+
+.n-pages-black:not(:last-child) {
+    border-right: 1px solid #626161;
+}
+
+.n-pages-black:last-child {
+    border-right: 1px solid #626161;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+
+.n-th-black {
+	background: rgb(62, 62, 62);
+    color: rgba(255,255,255,0.9);
+}
+
+.n-tr-black {
+    background: rgb(30, 30, 30);
+}
+
+.n-tr-black:nth-child(even) {
+    background-color: rgb(42, 41, 41);
+}
+
+.n-td-black {
+    color: rgba(255,255,255,0.9);
+}
+
+.n-delete-black {
+    background: rgb(228, 85, 85);
+}
+
+
+.n-th-gray {
+    color: rgb(84, 84, 84);
+	background: #ededed;
+}
+
+.n-tr-gray:nth-child(even) {
+    background: #f6f6f6;
+}
+
+.n-tr-gray {
+    background: #fafafa;
+}
+
+.n-delete-gray {
+    background: rgb(228, 85, 85);
+}
+
+
+.n-th-green {
+    color: white;
+	background: #009879;
+}
+
+.n-tr-green:nth-child(even) {
+    background: #f3f3f3;
+}
+
+
+/***********
+DIALOG
+************/
+
+.n-dialog-styles {
+    border: 0px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0px 0px 7px 1px rgba(0,0,0,0.58);
+    -moz-box-shadow: 0px 0px 7px 1px rgba(0,0,0,0.58);
+    box-shadow: 0px 0px 7px 1px rgba(0,0,0,0.58);
+}
+
+.n-dialog-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+}
+
+.n-dialog-field {
+    margin-top: 16px;
+}
+
+.n-dialog-input {
+    font-family: var(--font);
+    background: #f9fafb;
+    border: 1px solid #c0c4c9;
+    border-bottom: 2px solid #c0c4c9;
+    border-radius: 4px;
+    width: 50%;
+    color: #20242f;
+    padding: 10px;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+}
+
+.n-dialog-input:focus {
+    border: 1px solid #3b4ce2;
+    border-bottom: 2px solid #3b4ce2;
+}
+
+.n-div-btn {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.n-div-delete-btn {
+    margin-top: 40px;
+}
+
+.n-dialog-btn {
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+    border: 0px;
+    border-radius: 4px;
+    color: white;
+    padding: 8px;
+}
+
+.n-dialog-btn:hover {
+    cursor: pointer;
+}
+
+.n-dialog-btn-primary {
+    background: rgb(54, 148, 242);
+}
+
+.n-dialog-btn-warning {
+    background: #ffc107;
+} 
+
+.n-dialog-title {
+    font-size: 20px;
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+}
+
+/*********
+SPINNER
+**********/
+.n-div-spinner {
+    width: 100%;
+    display: none;
+    text-align: center;
+    margin-top: 7px;
+}
+
+.basic-loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #b0afaf;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+} 
+
+.small-loader {
+    width: 28px;
+    height: 28px;
+    border: 5px solid #b0afaf;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+/************ 
+ALERTS 
+*************/
+
+.n-alert {
+    padding-top: 6px;
+    margin: auto;
+    width: 60%;
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+    border-radius: 4px;
+}
+
+.n-alert button {
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+}
+
+.n-error-data {
+    border: 1px solid #f69a9a;
+    background-color: rgba(255, 56, 56, 0.05);
+    color: #ff3838;
+}
+
+ .n-try-again {
+    background: white;
+    font-size: 16px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgb(219, 217, 217);
+    border-radius: 6px;
+    padding: 10px;
+ }
+
+ .n-try-again:hover {
+    cursor: pointer;
+ }
+
+ .n-success-data {
+    border: 1px solid #6ac878;
+    background-color: rgba(46, 201, 70, 0.05);
+    color: #2ec946;
+    padding-bottom: 6px;
+ }
+
+ .n-errors {
+    padding-left: 8px;
+    padding-bottom: 8px;
+    text-align: start;
+ }

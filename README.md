@@ -208,3 +208,30 @@ const res = await fetch(`/your/data/next-page/${page}`)
 - gray
 - black
 - green
+
+### Font customization
+
+Donlowad the css file and modify the `:root` to change the font
+
+```css
+:root {
+    --font: "Roboto";
+    --font-weight: 500;
+}
+```
+
+Neptune uses the nexts properties to style the table
+
+```js
+const themeExample = {
+    table: "table-class",
+    tr: "tr-class",
+    th: "th-class",
+    td: "td-class",
+    delete: "delete-class",
+    pages_theme: "pagination-class",
+    page_active: "page-active-class" // active button
+}
+```
+
+For the moment the only way to add more themes is to go directly to the `js` file and call the function `nepAddTheme` with your theme object. 

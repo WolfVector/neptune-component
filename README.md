@@ -35,7 +35,7 @@ Just include the library using the CDN and you are good to go.
 <script src="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/neptune.min.js"></script>
 ```
 
-Also, you can download the files and uses them locally
+Also, you can download the files and use them locally
 ```js
 <link rel="stylesheet" href="neptune.css" />
 

@@ -69,7 +69,28 @@ Table component
 
 ### Update and n-key
 
-You can pass the `n-update` attribute in order to update the information using a modal. To display the modal you double click the row. It's important to provide the `n-key` attribute to define your row key, in this way, the library will pass it to your endpoint.
+You can pass the `n-update` attribute in order to update the information using a modal. To display the modal you double click the row. It's important to provide the `n-key` attribute to define your row key, in this way, the library will pass it to your endpoint. The data to be updated and the key value will be send using the POST method, in the format of a json object.
+
+For example, let's say you have the next endpoint that returns your data:
+
+```js
+router.get("/your/data", async function(req, res) {
+    const data = await query("SELECT id, email, name, lastName FROM table")
+    res.json({ rows: data })
+})
+```
+
+Then Neptune will use the table fields to construct the json object:
+
+```js
+const data = {
+    nRowKey: keyValue,
+    email: emailValue,
+    name: nameValue,
+    lastName: lastNameValue
+}
+```
+You can use the next table component:
 
 ```html
 <div 
@@ -94,22 +115,6 @@ You can pass the `n-update` attribute in order to update the information using a
 ```
 
 You can use the `n-load-spinner` and `n-progress-spinner` attributes to define the ids of yours spinners. It's very important to put the spinners inside the `div`
-
-This is how the library calls your endpoint
-
-```js
-const body = { 
-    nRowKey: n_key, // Key value
-    //... rest of the data
-}
-const res = await fetch(n_update, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-})
-```
 
 ### Delete
 

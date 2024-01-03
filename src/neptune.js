@@ -117,7 +117,7 @@ async function nepGetComponent(element) {
     const keys = Object.keys(res.rows[0])
     for(let i=0;i < keys.length;i++) {
       if(n_show_key === "false" && keys[i] == n_key) continue
-      
+
       let title_column = nepGetTitle(keys[i])
       nepTableMetaData[tableId].titles.push(title_column)
       nepTableMetaData[tableId].keys.push(keys[i])
@@ -391,12 +391,16 @@ async function nepUpdateRow() {
   const dialog = document.getElementById("n_dialog")
   const inputs = dialog.querySelectorAll("input[type=text]")
   const n_progress_spinner = nepTableMetaData[tableId].n_progress_spinner
+  const keyName = nepTableMetaData[tableId].n_key
 
-  const body = { nRowKey: rowKey }
+  const body = {}
+  body[keyName] = rowKey
 
   Array.from(inputs).forEach((element, index) => {
     body[fields[index]] = element.value
   })
+
+  console.log(body)
 
   /* If the error element exists, then remove it */
   const errorElement = dialog.querySelector("[n-error-container]")

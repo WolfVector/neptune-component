@@ -41,6 +41,7 @@ Just include the library using the CDN
 
 The `n-url` attribute defines the endpoint from where to get the data. The library expects the data in a `rows` property.
 
+Endpoint example
 ```js
 router.get("/your/data", async function(req, res) {
     const data = await query("SELECT * FROM table")
@@ -48,6 +49,7 @@ router.get("/your/data", async function(req, res) {
 })
 ```
 
+Table component
 ```html
 <div 
     n-table                     <!-- Define the table -->
@@ -141,6 +143,7 @@ const res = await fetch(fullUrl, {
 
 Use `n-pagination` attribute to show pagination buttons and define your endpoint to get more data. In order to show the pagination buttons you must provide the property `pageNumbers` in your `n-url` endpoint
 
+Endpoint example
 ```js
 router.get("/your/data", async function(req, res) {
     const pages = await query("SELECT COUNT(*) FROM table")

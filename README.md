@@ -10,8 +10,8 @@ Neptune is a table component that allows you to build tables faster. Just write 
     n-update="/your/data/update"                <!-- Show a modal and update the information using your endpoint -->
     n-key="id"                                  <!-- Define the key so the library can pass the value to your endpoint and know which row to update or delete -->
     n-show-key="false"                          <!-- Don't show the key values -->
-    n-delete="/your/data/delete"                <!-- Show delete button and use your endpoint to delete the row -->
-    n-pagination="/your/data/next-page"         <!-- Show pagination buttons and define the url to get more information -->
+    n-delete="/your/data/delete/{key}"          <!-- Show delete button and use your endpoint to delete the row -->
+    n-pagination="/your/data/next-page/{page}"  <!-- Show pagination buttons and define the url to get more information -->
     n-load-spinner="normal_spinner"             <!-- Show spinner when information is loading -->
     n-progress-spinner="small_spinner"          <!-- Show spinner when row is updating or being deleted -->
     >
@@ -70,7 +70,7 @@ You can pass the `n-update` attribute in order to update the information using a
     n-title                             <!-- Transform titles from titleName or title_name to Title Name -->
     n-show-key="false"                  <!-- Don't show the key values -->
     n-key="id"                          <!-- Define the key so the library can pass the value to your endpoint-->
-    n-update="/your/data/update"         <!-- Show a modal and update the information using your endpoint -->
+    n-update="/your/data/update"        <!-- Show a modal and update the information using your endpoint -->
     n-load-spinner="normal_spinner"     <!-- Id of the spinner when information is loading -->   
     n-progress-spinner="small_spinner"  <!-- Id of the spinner when row is updating or being deleted -->
     >
@@ -104,12 +104,13 @@ const res = await fetch(n_update, {
 
 ### Delete
 
-The `n-delete` attribute will display a delete button in every row of the table. The library is going to call the endpoint defined in that attribute and is going to pass the key too.
+The `n-delete` attribute will display a delete button in every row of the table. This attribute must have the pattern: `/your/data/delete/{key}`. You can put the `{key}` substring anywhere you want, this substring gets replaced by the actual key value.
 
 The library does something like this:
 
 ```js
-const res = await fetch(`/your/data/delete/${rowKey}`, {
+let fullUrl = urlDelete.replace(/\{key\}/, rowKey)
+const res = await fetch(fullUrl, {
     method: "DELETE"
 })
 ```
@@ -122,7 +123,7 @@ const res = await fetch(`/your/data/delete/${rowKey}`, {
     n-title                             <!-- Transform titles from titleName or title_name to Title Name -->
     n-show-key="false"                  <!-- Don't show the key values -->
     n-key="id"                          <!-- Define the key so the library can pass the value to your endpoint-->
-    n-delete="/your/data/delete"        <!-- Show delete button and use your endpoint to delete the row -->
+    n-delete="/your/data/delete/{key}"  <!-- Show delete button and use your endpoint to delete the row -->
     n-load-spinner="normal_spinner"     <!-- Id of the spinner when information is loading -->   
     n-progress-spinner="small_spinner"  <!-- Id of the spinner when row is updating or being deleted -->
     >
@@ -152,14 +153,14 @@ The library will use `pageNumbers` to show the buttons.
 
 ```html
 <div 
-    n-table                             <!-- Define the table -->
-    n-url="/your/data"                  <!-- url to get the data -->
+    n-table                                     <!-- Define the table -->
+    n-url="/your/data"                          <!-- url to get the data -->
     n-theme="normal" 
-    n-title                             <!-- Transform titles from titleName or title_name to Title Name -->
-    n-show-key="false"                  <!-- Don't show the key values -->
-    n-key="id"                          <!-- Define the key so the above works -->
-    n-pagination="/your/data/next-page" <!-- Show pagination buttons and define the url to get more information -->
-    n-load-spinner="normal_spinner"     <!-- Id of the spinner when information is loading -->   
+    n-title                                     <!-- Transform titles from titleName or title_name to Title Name -->
+    n-show-key="false"                          <!-- Don't show the key values -->
+    n-key="id"                                  <!-- Define the key so the above works -->
+    n-pagination="/your/data/next-page/{page}"  <!-- Show pagination buttons and define the url to get more information -->
+    n-load-spinner="normal_spinner"             <!-- Id of the spinner when information is loading -->   
     >
     <!-- These spinners are included in the library -->
     <div id="normal_spinner" class="n-div-spinner">
@@ -168,10 +169,11 @@ The library will use `pageNumbers` to show the buttons.
 </div>
 ```
 
-Also, Neptune will automatically append the next page
+Also, notice the way you define the `n-pagination` attribute, is identical to `n-delete`. So you can put the `{page}` substring anywhere you want, this substring gets replaced by the actual page value. Neptune does the next behind the scenes:
 
 ```js
-const res = await fetch(`/your/data/next-page/${page}`)
+let fullUrl = urlnepNextPage.replace(/\{page\}/, page)
+const res = await fetch(fullUrl)
 ```
 
 ![](pagination.gif)
@@ -187,8 +189,8 @@ const res = await fetch(`/your/data/next-page/${page}`)
     n-update="/your/data/update"                <!-- Show a modal and update the information using your endpoint -->
     n-key="id"                                  <!-- Define the key so the library can pass the value to your endpoint and know which row to update or delete -->
     n-show-key="false"                          <!-- Don't show the key values -->
-    n-delete="/your/data/delete"                <!-- Show delete button and use your endpoint to delete the row -->
-    n-pagination="/your/data/next-page"         <!-- Show pagination buttons and define the url to get more information -->
+    n-delete="/your/data/delete/{key}"          <!-- Show delete button and use your endpoint to delete the row -->
+    n-pagination="/your/data/next-page/{page}"  <!-- Show pagination buttons and define the url to get more information -->
     n-load-spinner="normal_spinner"             <!-- Show spinner when information is loading -->
     n-progress-spinner="small_spinner"          <!-- Show spinner when row is updating or being deleted -->
     >
@@ -209,7 +211,7 @@ const res = await fetch(`/your/data/next-page/${page}`)
 - black
 - green
 
-### Font customization
+### Font and css customization
 
 Donlowad the css file and modify the `:root` to change the font
 

@@ -28,11 +28,18 @@ Neptune is a table component that allows you to build tables faster. Just write 
 
 ## Installation
 
-Just include the library using the CDN
+Just include the library using the CDN and you are good to go.
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/neptune.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/neptune.min.css" />
 
-<script src="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/neptune.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/neptune.min.js"></script>
+```
+
+Also, you can download the files and uses them locally
+```js
+<link rel="stylesheet" href="neptune.css" />
+
+<script src="neptune.js"></script>
 ```
 
 ## Usage
@@ -108,15 +115,6 @@ const res = await fetch(n_update, {
 
 The `n-delete` attribute will display a delete button in every row of the table. This attribute must have the pattern: `/your/data/delete/{key}`. You can put the `{key}` substring anywhere you want, this substring gets replaced by the actual key value.
 
-The library does something like this:
-
-```js
-let fullUrl = urlDelete.replace(/\{key\}/, rowKey)
-const res = await fetch(fullUrl, {
-    method: "DELETE"
-})
-```
-
 ```html
 <div 
     n-table                             <!-- Define the table -->
@@ -137,6 +135,15 @@ const res = await fetch(fullUrl, {
         <div class="small-loader"></div>
     </div>
 </div>
+```
+
+The library does something like this behind the scenes:
+
+```js
+let fullUrl = urlDelete.replace(/\{key\}/, rowKey)
+const res = await fetch(fullUrl, {
+    method: "DELETE"
+})
 ```
 
 ### Pagination

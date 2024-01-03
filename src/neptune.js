@@ -81,8 +81,7 @@ async function nepGetComponent(element) {
   let temp = element.getAttribute("n-theme")
   const theme = (nepThemes.hasOwnProperty(temp)) ? nepThemes[temp] : nepEmptyTheme
   const n_key = element.getAttribute("n-key")
-  temp = element.getAttribute("n-show-key")
-  const n_show_key = (temp) ? temp : "true"
+  const n_show_key = element.getAttribute("n-show-key")
   const n_update = element.getAttribute("n-update")
   const n_delete = element.getAttribute("n-delete")
   const n_pagination = element.getAttribute("n-pagination")
@@ -116,12 +115,12 @@ async function nepGetComponent(element) {
   if(res.rows.length) {
     const keys = Object.keys(res.rows[0])
     for(let i=0;i < keys.length;i++) {
-      if(n_show_key === "false" && keys[i] === n_key) continue
-      
-      let title_column = nepGetTitle(keys[i])
-      nepTableMetaData[tableId].titles.push(title_column)
-      nepTableMetaData[tableId].keys.push(keys[i])
-      title += `<th class="${theme.th}">${title_column}</th>`
+      if(n_show_key === "false" && keys[i] != n_key) {
+        let title_column = nepGetTitle(keys[i])
+        nepTableMetaData[tableId].titles.push(title_column)
+        nepTableMetaData[tableId].keys.push(keys[i])
+        title += `<th class="${theme.th}">${title_column}</th>`
+      }
     }
   }
 
@@ -319,7 +318,7 @@ async function nepDeleteRow() {
 
   const n_progress_spinner = nepTableMetaData[tableId].n_progress_spinner
   let urlDelete = nepTableMetaData[tableId].urlDelete
-  urlDelete = (urlDelete.charAt(urlDelete.length - 1) === "/") ? urlDelete : urlDelete + "/"
+  urlDelete = urlDelete.replace(/\{key\}/, rowKey)
 
   /* If the error element exists, then remove it */
   const errorElement = dialog.querySelector("[n-error-container]")
@@ -328,7 +327,7 @@ async function nepDeleteRow() {
 
   nepProgressSpinner(n_progress_spinner, dialog)
  
-  const res = await nepHandleAsyncReq(urlDelete + rowKey, {
+  const res = await nepHandleAsyncReq(urlDelete, {
     method: "DELETE"
   })
 
@@ -476,7 +475,7 @@ function nepAddPageNumbers(n_pagination, pageNumbers, tableId) {
 async function nepNextPage(urlnepNextPage, page, tableId) {
   const n_load_spinner = nepTableMetaData[tableId].n_load_spinner
   const tableElement = document.getElementById(tableId).querySelector("tbody")
-  urlnepNextPage = (urlnepNextPage.charAt(urlnepNextPage.length - 1) === "/") ? urlnepNextPage : urlnepNextPage + "/"
+  urlnepNextPage = urlnepNextPage.replace(/\{page\}/, page)
 
   tableElement.parentElement.scrollIntoView(true)
   
@@ -489,7 +488,7 @@ async function nepNextPage(urlnepNextPage, page, tableId) {
     tableElement.firstChild.firstChild.append(spinner)
   }
 
-  const res = await nepHandleAsyncReq(urlnepNextPage + page)
+  const res = await nepHandleAsyncReq(urlnepNextPage)
   if(spinner) 
     tableElement.removeChild(tableElement.firstElementChild)
   if(res === false) {

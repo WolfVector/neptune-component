@@ -222,13 +222,15 @@ function nepValidationErrors(dialog, messages) {
     errors += `<li>${message}</li>`
   })
 
-  dialog.innerHTML += `
-    <div n-validation-errors style="text-align: center; margin-top: 10px;">
-      <div class="n-alert n-error-data n-errors">
-        ${errors}
-      </div>
-    </div>
-  `
+  const errorElement = document.createElement("div")
+  errorElement.setAttribute("n-validation-errors", "")
+  errorElement.style = "text-align: center; margin-top: 10px;"
+  errorElement.innerHTML = `
+    <div class="n-alert n-error-data n-errors">
+      ${errors}
+    </div>`
+
+  dialog.append(errorElement)
 }
 
 function nepGetRows(rows, metaData) {
@@ -400,12 +402,11 @@ async function nepUpdateRow() {
     body[fields[index]] = element.value
   })
 
-  console.log(body)
 
   /* If the error element exists, then remove it */
-  const errorElement = dialog.querySelector("[n-error-container]")
+  /*const errorElement = dialog.querySelector("[n-error-container]")
   if(errorElement)
-    errorElement.remove()
+    errorElement.remove()*/
 
   /* If the validation element exists, then remove it */
   const validation = dialog.querySelector("[n-validation-errors]")
@@ -424,9 +425,9 @@ async function nepUpdateRow() {
 
   nepHideProgressSpinner(n_progress_spinner, dialog)
 
-  if(res === false)
-    nepShowDataError(dialog, "There was an error while updating the data", () => nepUpdateRow())
-  else if(res?.messages?.length)
+  /*if(res === false)
+    nepShowDataError(dialog, "There was an error while updating the data", () => nepUpdateRow())*/
+  if(res?.messages?.length)
     nepValidationErrors(dialog, res.messages)
   else {
     let trRow = document.getElementById(tableId).querySelector(`[n-key="${rowKey}"]`)

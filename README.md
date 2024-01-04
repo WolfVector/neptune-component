@@ -26,7 +26,7 @@ Neptune is a table component that allows you to build tables faster. Just write 
 ```
 ![](example.gif)
 
-Neptune can also show validation errors.
+Neptune can also show **validation errors**.
 
 ## Installation
 
@@ -71,7 +71,7 @@ Table component
 
 ### Update and n-key
 
-You can pass the `n-update` attribute in order to update the information using a modal. To display the modal you double click the row. It's important to provide the `n-key` attribute to define your row key, in this way, the library will pass it to your endpoint. The data to be updated and the key value will be send using the POST method, in the format of a json object.
+You can pass the `n-update` attribute to update the information using a modal. To display the modal you double click the row. It's important to provide the `n-key` attribute to define your row key, in this way, the library will pass it to your endpoint. The data to be updated and the key value will be send using the POST method, in the format of a json object.
 
 For example, let's say you have the next endpoint that returns your data:
 
@@ -216,7 +216,7 @@ const res = await fetch(fullUrl)
 
 You can show the validation errors returned by your endpoint. Neptune expects this errors to be in the `messages` property. This property must be an array.
 
-
+![](validations.gif)
 
 ### Themes
 

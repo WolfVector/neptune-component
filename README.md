@@ -26,6 +26,8 @@ Neptune is a table component that allows you to build tables faster. Just write 
 ```
 ![](example.gif)
 
+Neptune can also show validation errors.
+
 ## Installation
 
 Just include the library using the CDN and you are good to go.
@@ -84,7 +86,7 @@ Then Neptune will use the table fields to construct the json object:
 
 ```js
 const data = {
-    nRowKey: keyValue,
+    id: keyValue,
     email: emailValue,
     name: nameValue,
     lastName: lastNameValue
@@ -140,15 +142,6 @@ The `n-delete` attribute will display a delete button in every row of the table.
         <div class="small-loader"></div>
     </div>
 </div>
-```
-
-The library does something like this behind the scenes:
-
-```js
-let fullUrl = urlDelete.replace(/\{key\}/, rowKey)
-const res = await fetch(fullUrl, {
-    method: "DELETE"
-})
 ```
 
 ### Pagination
@@ -218,6 +211,12 @@ const res = await fetch(fullUrl)
     </div>
 </div>
 ```
+
+### Validation errors
+
+You can show the validation errors returned by your endpoint. Neptune expects this errors to be in the `messages` property. This property must be an array.
+
+
 
 ### Themes
 

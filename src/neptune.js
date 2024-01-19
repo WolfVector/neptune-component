@@ -81,6 +81,7 @@ async function nepGetComponent(element) {
   let temp = element.getAttribute("n-theme")
   const theme = (nepThemes.hasOwnProperty(temp)) ? nepThemes[temp] : nepEmptyTheme
   const n_key = element.getAttribute("n-key")
+  const n_title = element.getAttribute("n-title")
   temp = element.getAttribute("n-show-key")
   const n_show_key = (temp) ? temp : "true"
   const n_update = element.getAttribute("n-update")
@@ -88,17 +89,21 @@ async function nepGetComponent(element) {
   const n_pagination = element.getAttribute("n-pagination")
   const n_load_spinner = element.getAttribute("n-load-spinner")
   const n_progress_spinner = element.getAttribute("n-progress-spinner")
+  const n_client_side = element.getAttribute("n-client-side")
   const tableId = `n_table${nepTableIds++}` 
   nepTableMetaData[tableId] = { 
     titles: [], 
     keys: [], 
+    n_title,
     urlUpdate: n_update, 
     urlDelete: n_delete,
+    urlPagination: n_pagination,
     n_key,
     n_show_key,
     theme,
     n_load_spinner,
-    n_progress_spinner
+    n_progress_spinner,
+    n_client_side: parseInt(n_client_side)
   }
 
   const spinner = nepLoadSpinner(n_load_spinner)
@@ -118,7 +123,7 @@ async function nepGetComponent(element) {
     for(let i=0;i < keys.length;i++) {
       if(n_show_key === "false" && keys[i] == n_key) continue
 
-      let title_column = nepGetTitle(keys[i])
+      let title_column = nepGetTitle(keys[i], n_title)
       nepTableMetaData[tableId].titles.push(title_column)
       nepTableMetaData[tableId].keys.push(keys[i])
       title += `<th class="${theme.th}">${title_column}</th>`
@@ -129,9 +134,18 @@ async function nepGetComponent(element) {
   if(n_delete)
     title += `<th class="${theme.th}">Delete</th>`
 
+  //Pagination type
+  const { currentRows, pageNumbers } = nepPaginationType(res, nepTableMetaData[tableId])
+
   // Get rows
-  let rowsTable = nepGetRows(res.rows, nepTableMetaData[tableId])
-  const pageNumbersElement = nepAddPageNumbers(n_pagination, res?.pageNumbers, tableId)
+  let rowsTable = nepGetRows(currentRows, nepTableMetaData[tableId])
+  let pageNumbersElement = null
+
+  // If client side was defined
+  if(n_client_side)
+    pageNumbersElement = nepAddPageNumbers("client", pageNumbers, tableId)
+  else if(n_pagination) // else, check if server pagination was defined
+    pageNumbersElement = nepAddPageNumbers("server", pageNumbers, tableId)
 
   element.classList.remove("div-parent")
   element.innerHTML += `
@@ -233,6 +247,21 @@ function nepValidationErrors(dialog, messages) {
   dialog.append(errorElement)
 }
 
+function nepPaginationType(res, metaData) {
+  let currentRows = res.rows
+  let pageNumbers = res.pageNumbers
+  const n_client_side = metaData.n_client_side
+
+  if(n_client_side) {
+    pageNumbers = Math.ceil(res.rows.length / n_client_side)
+    metaData.rows = res.rows
+    currentRows = res.rows.slice(0, n_client_side)
+  }
+  
+
+  return { currentRows, pageNumbers }
+}
+
 function nepGetRows(rows, metaData) {
   let rowsTable = ''
   const n_key = metaData.n_key
@@ -240,21 +269,24 @@ function nepGetRows(rows, metaData) {
   const n_show_key = metaData.n_show_key
   const n_delete = metaData.urlDelete
   const n_update = metaData.urlUpdate
+  const n_client_side = metaData.n_client_side
 
   let updateCursor = ""
   if(n_update)
     updateCursor = "n-update-cursor"
 
-  // Construct the tbody
-  for(let i=0;i < rows.length;i++) {
-    rowsTable += `<tr n-key="${rows[i][n_key]}"  class="${theme.tr}">`
-    if(n_show_key === "false") // Don't show the row key if required
-      delete rows[i][n_key]
+  let rowsLimit = rows.length
+  if(n_client_side) //ppppp
+    rowsLimit = n_client_side
 
-    const row = Object.values(rows[i])
-    
-    for(let j=0;j < row.length;j++) {
-      rowsTable += `<td class="${theme.td} ${updateCursor}">${row[j]}</td>`
+  // Construct the tbody
+  for(let i=0;i < rowsLimit;i++) {
+    rowsTable += `<tr n-key="${rows[i][n_key]}"  class="${theme.tr}">`
+    const row = rows[i]
+
+    for(const [key, value] of Object.entries(row)) {
+      if(n_show_key === "false" && n_key == key) continue
+      rowsTable += `<td class="${theme.td} ${updateCursor}">${value}</td>`
     }
 
     if(n_delete)
@@ -267,10 +299,10 @@ function nepGetRows(rows, metaData) {
 }
 
 /** Convert from fieldName or field_name to Field Name */
-function nepGetTitle(title_column) {
-  if(/^[a-z][A-Za-z]*$/.test(title_column))
+function nepGetTitle(title_column, n_title) {
+  if(n_title !== null && /^[a-z][A-Za-z]*$/.test(title_column))
     return title_column.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); })
-  else if(/^[a-zA-Z]+(_[a-zA-Z]+)*$/.test(title_column)) {
+  else if(n_title !== null && /^[a-zA-Z]+(_[a-zA-Z]+)*$/.test(title_column)) {
     title_column = title_column.toLowerCase()
     let words =  title_column.replace(/_/g, " ").split(" ")
     for (var i = 0; i < words.length; i++) {
@@ -322,6 +354,10 @@ async function nepDeleteRow() {
 
   const n_progress_spinner = nepTableMetaData[tableId].n_progress_spinner
   let urlDelete = nepTableMetaData[tableId].urlDelete
+  if(!urlDelete.includes("{key}")) {
+    console.log("NEPTUNE: the 'n-delete' attribute must include '{key}'")
+    return
+  }
   urlDelete = urlDelete.replace(/\{key\}/, rowKey)
 
   /* If the error element exists, then remove it */
@@ -445,32 +481,38 @@ function nepCloseDialog() {
 }
 
 /** Add pages */
-function nepAddPageNumbers(n_pagination, pageNumbers, tableId) {
-  let pageNumbersElement = null
+function nepAddPageNumbers(renderingType, pageNumbers, tableId) {
+  let pageNumbersElement = document.createElement("div")
+  pageNumbersElement.classList.add("n-pages-div")
 
-  if(n_pagination) {
-    pageNumbersElement = document.createElement("div")
-    pageNumbersElement.classList.add("n-pages-div")
+  if(renderingType == "server" && pageNumbers === null) {
+    //TO CONSIDER: cursor pagination
+    console.log("NEPTUNE: you are using 'n-pagination' but your endpoint does not return 'pageNumbers'")
+    return
+  }
 
-    for(let i=0;i < pageNumbers;i++) {
-      let pageTheme = nepTableMetaData[tableId].theme.pages_theme
-      let pageActive = (i == 0) ? nepTableMetaData[tableId].theme.page_active : "" // Add active class
-      pageNumbersElement.innerHTML += `<button n-page-number="${i + 1}" class="${pageTheme} ${pageActive}">${i + 1}</button>`
-    }
+  for(let i=0;i < pageNumbers;i++) {
+    let pageTheme = nepTableMetaData[tableId].theme.pages_theme
+    let pageActive = (i == 0) ? nepTableMetaData[tableId].theme.page_active : "" // Add active class
+    pageNumbersElement.innerHTML += `<button n-page-number="${i + 1}" class="${pageTheme} ${pageActive}">${i + 1}</button>`
+  }
 
+  if(renderingType === "server") {
     pageNumbersElement.addEventListener("click", (e) => {
       if(e.target.tagName === "BUTTON") {
-        const pageActive = nepTableMetaData[tableId].theme.page_active
-        if(pageActive && pageActive != "") {
-          /* Remove active class and add it to the new button */
-          const active = e.target.parentElement.querySelector("." + pageActive)
-          active.classList.remove(pageActive)
-
-          e.target.classList.add(pageActive)
-        }
+        switchActivePage(e, tableId)
 
         const page = e.target.getAttribute("n-page-number")
-        nepNextPage(n_pagination, page, tableId)
+        nepNextServerPage(page, tableId)
+      }
+    })
+  }
+  else if(renderingType === "client") {
+    pageNumbersElement.addEventListener("click", (e) => {
+      if(e.target.tagName === "BUTTON") {
+        switchActivePage(e, tableId)
+        const page = e.target.getAttribute("n-page-number")
+        nepNextClientPage(page, tableId)
       }
     })
   }
@@ -478,12 +520,29 @@ function nepAddPageNumbers(n_pagination, pageNumbers, tableId) {
   return pageNumbersElement
 }
 
+function switchActivePage(e, tableId) {
+  const pageActive = nepTableMetaData[tableId].theme.page_active
+  if(pageActive && pageActive != "") {
+    /* Remove active class and add it to the new button */
+    const active = e.target.parentElement.querySelector("." + pageActive)
+    active.classList.remove(pageActive)
+
+    e.target.classList.add(pageActive)
+  }
+}
+
 /** Next page request */
-async function nepNextPage(urlnepNextPage, page, tableId) {
+async function nepNextServerPage(page, tableId) {
   const n_load_spinner = nepTableMetaData[tableId].n_load_spinner
   const tableElement = document.getElementById(tableId).querySelector("tbody")
-  urlnepNextPage = urlnepNextPage.replace(/\{page\}/, page)
+  let urlnepNextPage = nepTableMetaData[tableId].urlPagination
 
+  if(!urlnepNextPage.includes("{page}")) {
+    console.log("NEPTUNE: The 'n-pagination' attribute must include '{page}'")
+    return
+  }
+
+  urlnepNextPage = urlnepNextPage.replace(/\{page\}/, page)
   tableElement.parentElement.scrollIntoView(true)
   
   let spinner = null
@@ -500,7 +559,7 @@ async function nepNextPage(urlnepNextPage, page, tableId) {
     tableElement.removeChild(tableElement.firstElementChild)
   if(res === false) {
     tableElement.innerHTML = `<tr><td colspan="${nepTableMetaData[tableId].titles.length + 1}"></td></tr>`
-    nepShowDataError(tableElement.firstChild.firstChild, "There was an error while getting the data", () => nepNextPage(urlnepNextPage, page, tableId))
+    nepShowDataError(tableElement.firstChild.firstChild, "There was an error while getting the data", () => nepNextServerPage(urlnepNextPage, page, tableId))
   }
 
   const rowsTable = nepGetRows(res.rows, nepTableMetaData[tableId])
@@ -509,4 +568,18 @@ async function nepNextPage(urlnepNextPage, page, tableId) {
 
 }
 
-nepTableComponent()
+function nepNextClientPage(page, tableId) {
+  const n_client_side = nepTableMetaData[tableId].n_client_side // Get the number of rows to display
+  const nextPage = (page - 1) * n_client_side // Calculate the next page
+  const rows = nepTableMetaData[tableId].rows.slice(nextPage, nextPage + n_client_side) // Get the elements
+  const tableElement = document.getElementById(tableId).querySelector("tbody")
+  
+  // Scroll to the top and replace the tbody content with the new data
+  tableElement.parentElement.scrollIntoView(true)
+  const rowsTable = nepGetRows(rows, nepTableMetaData[tableId])
+  tableElement.innerHTML = rowsTable
+}
+
+window.addEventListener("load", function(){
+  nepTableComponent()
+});

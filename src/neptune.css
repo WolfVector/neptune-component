@@ -366,3 +366,25 @@ ALERTS
     padding-bottom: 8px;
     text-align: start;
  }
+
+ /*******CSV BUTTON**********/
+
+ .csv-button {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 6px;
+ }
+
+ .csv-button button {
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+    font-size: 14px;
+    background-color: #6ac878;
+    color: white;
+    border: 0;
+    border-radius: 4px;
+    padding: 7px;
+ }
+
+ /*****************/
+ 

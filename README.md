@@ -5,7 +5,7 @@ Neptune is a table component that allows you to build tables faster. Just write 
 <div 
     n-table                                     <!-- Define the table -->
     n-url="/your/data"                          <!-- url to get the data -->
-    n-theme="normal" 
+    n-theme="normal"                            <!-- By default is "normal" -->
     n-title                                     <!-- Transform titles from titleName or title_name to Title Name -->
     n-update="/your/data/update"                <!-- Show a modal and update the information using your endpoint -->
     n-key="id"                                  <!-- Define the key so the library can pass the value to your endpoint and know which row to update or delete -->
@@ -35,9 +35,10 @@ Neptune can also show **validation errors**.
 4. [Delete](#delete)
 5. [Server side Pagination](#server-pagination)
 6. [Client Side Pagination](#client-pagination)
-7. [Full example](#full-example)
-8. [Validation errors](#validation-errors)
-9. [Themes](#themes)
+7. [Download as CSV](#csv-download)
+8. [Full example](#full-example)
+9. [Validation errors](#validation-errors)
+10. [Themes](#themes)
 
 ## Installation <a id="installation"></a>
 
@@ -208,6 +209,35 @@ With client side pagination you can pull all the data you need and add page butt
         n-client-side="20"                                  <!-- Define the number of rows per page -->
         n-delete="/neptune/table/delete/{key}"              <!-- Show delete button and use your endpoint to delete the row -->
         n-load-spinner="normal_spinner"                     <!-- Show spinner when information is loading -->
+        n-progress-spinner="small_spinner"          <!-- Show spinner when row is updating or being deleted -->
+        >
+        <!-- This spinners are included in the library -->
+        <div id="normal_spinner" class="n-div-spinner">
+            <div class="basic-loader"></div>
+        </div>
+        <div id="small_spinner" class="n-div-spinner">
+            <div class="small-loader"></div>
+        </div>
+    </div>
+```
+
+With `n-client-side` you define the number of rows per page, and based on that Neptune will organize your data.}
+
+### CSV download <a id="CSV download"></a>
+
+You can add a button to download the data as csv using `n-csv="true"`. However, for the moment this functionality only works when you have pull all your data  
+
+```html
+<div 
+        n-table                                             <!-- Define the table -->
+        n-url="/your/data"                                  <!-- url to get the data -->
+        n-theme="normal" 
+        n-title                                             <!-- Transform titles from titleName or title_name to Title Name -->
+        n-show-key="false"                                  <!-- Don't show the key values -->
+        n-key="id"                                          <!-- Define the key -->
+        n-client-side="20"                                  <!-- Define the number of rows per page -->
+        n-load-spinner="normal_spinner"                     <!-- Show spinner when information is loading -->
+        n-csv="true"                                        <!-- Show button to download the data as csv -->
         >
         <!-- This spinners are included in the library -->
         <div id="normal_spinner" class="n-div-spinner">
@@ -216,7 +246,7 @@ With client side pagination you can pull all the data you need and add page butt
     </div>
 ```
 
-With `n-client-side` you define the number of rows per page, and based on that Neptune will organize your data.
+It is not necessary to use `n-client-side` for this to work. As long as you have pull all your data you will be ok. 
 
 ### Full example <a id="full-example"></a>
 

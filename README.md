@@ -223,7 +223,7 @@ With client side pagination you can pull all the data you need and add page butt
 
 With `n-client-side` you define the number of rows per page, and based on that Neptune will organize your data.}
 
-### CSV download <a id="CSV download"></a>
+### CSV download <a id="CSV-download"></a>
 
 You can add a button to download the data as csv using `n-csv="true"`. However, for the moment this functionality only works when you have pull all your data  
 

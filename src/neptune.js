@@ -79,7 +79,7 @@ async function nepGetComponent(element) {
   // Get attributes and save them in the metadata object
   const urlTable = element.getAttribute("n-url")
   let temp = element.getAttribute("n-theme")
-  const theme = (nepThemes.hasOwnProperty(temp)) ? nepThemes[temp] : nepEmptyTheme
+  const theme = (nepThemes.hasOwnProperty(temp)) ? nepThemes[temp] : nepThemes["normal"]
   const n_key = element.getAttribute("n-key")
   const n_title = element.getAttribute("n-title")
   temp = element.getAttribute("n-show-key")
@@ -90,6 +90,8 @@ async function nepGetComponent(element) {
   const n_load_spinner = element.getAttribute("n-load-spinner")
   const n_progress_spinner = element.getAttribute("n-progress-spinner")
   const n_client_side = element.getAttribute("n-client-side")
+  temp = element.getAttribute("n-csv")
+  const n_csv = (temp) ? temp : "true"
   const tableId = `n_table${nepTableIds++}` 
   nepTableMetaData[tableId] = { 
     titles: [], 
@@ -103,7 +105,8 @@ async function nepGetComponent(element) {
     theme,
     n_load_spinner,
     n_progress_spinner,
-    n_client_side: parseInt(n_client_side)
+    n_client_side: parseInt(n_client_side),
+    n_csv
   }
 
   const spinner = nepLoadSpinner(n_load_spinner)
@@ -147,8 +150,15 @@ async function nepGetComponent(element) {
   else if(n_pagination) // else, check if server pagination was defined
     pageNumbersElement = nepAddPageNumbers("server", pageNumbers, tableId)
 
+  let csvButton = ""
+  if(n_csv === "true" && (n_client_side || n_pagination === null))
+    csvButton = `<div class="csv-button"><button onclick="nepDownloadCSV('${tableId}')">Download as CSV</button></div>`
+  else if(n_csv === "true")
+    console.log("NEPTUNE: for the moment the CSV download only works when you have pull all your data")
+
   element.classList.remove("div-parent")
   element.innerHTML += `
+    ${csvButton}
     <table id="${tableId}" class="${theme.table}">
       <thead>
         <tr>
@@ -578,6 +588,37 @@ function nepNextClientPage(page, tableId) {
   tableElement.parentElement.scrollIntoView(true)
   const rowsTable = nepGetRows(rows, nepTableMetaData[tableId])
   tableElement.innerHTML = rowsTable
+}
+
+/******** Donwload CSV ********/
+function nepDownloadCSV(tableId) {
+  /******  Fill CSV ******/
+  let csvRows = []; 
+  const headers = nepTableMetaData[tableId].titles
+  const keys = nepTableMetaData[tableId].keys
+  const rows = nepTableMetaData[tableId].rows
+
+  csvRows.push(headers.join(',')); 
+
+  for(let i in rows) {
+    const values = keys.map(e => { 
+      let row = rows[i]
+      return row[e] 
+    })
+    csvRows.push(values.join(',')) 
+  }
+
+  csvRows = csvRows.join('\n') 
+
+  /************ Download action *******************/
+  const blob = new Blob([csvRows], { type: 'text/csv' }); 
+  
+  const url = window.URL.createObjectURL(blob) 
+  const a = document.createElement('a') 
+
+  a.setAttribute('href', url) 
+  a.setAttribute('download', 'data.csv'); 
+  a.click()  
 }
 
 window.addEventListener("load", function(){

@@ -90,8 +90,7 @@ async function nepGetComponent(element) {
   const n_load_spinner = element.getAttribute("n-load-spinner")
   const n_progress_spinner = element.getAttribute("n-progress-spinner")
   const n_client_side = element.getAttribute("n-client-side")
-  temp = element.getAttribute("n-csv")
-  const n_csv = (temp) ? temp : "true"
+  const n_csv = element.getAttribute("n-csv")
   const tableId = `n_table${nepTableIds++}` 
   nepTableMetaData[tableId] = { 
     titles: [], 
@@ -266,6 +265,10 @@ function nepPaginationType(res, metaData) {
     pageNumbers = Math.ceil(res.rows.length / n_client_side)
     metaData.rows = res.rows
     currentRows = res.rows.slice(0, n_client_side)
+  }
+  else if(metaData.urlPagination === null && metaData.n_csv === "true") {
+    console.log("sii")
+    metaData.rows = res.rows
   }
   
 

@@ -27,7 +27,9 @@ nepAddTheme("normal", {
   td: "n-td",
   delete: "n-delete n-delete-normal",
   pages_theme: "n-pages n-pages-normal",
-  page_active: "n-pages-normal-active"
+  page_active: "n-pages-normal-active",
+  sort: "sort-normal",
+  csv: "csv-button csv-button-normal csv-img-normal"
 })
 
 nepAddTheme("black", {
@@ -37,7 +39,9 @@ nepAddTheme("black", {
   td: "n-td n-td-black",
   delete: "n-delete n-delete-black",
   pages_theme: "n-pages n-pages-normal n-pages-black",
-  page_active: "n-pages-black-active"
+  page_active: "n-pages-black-active",
+  sort: "sort-black",
+  csv: "csv-button csv-button-black csv-img-black"
 })
 
 nepAddTheme("gray", {
@@ -47,7 +51,9 @@ nepAddTheme("gray", {
   td: "n-td",
   delete: "n-delete n-delete-gray",
   pages_theme: "n-pages n-pages-normal",
-  page_active: "n-pages-normal-active"
+  page_active: "n-pages-normal-active",
+  sort: "sort-gray",
+  csv: "csv-button csv-button-gray csv-img-gray"
 })
 
 nepAddTheme("green", {
@@ -57,7 +63,9 @@ nepAddTheme("green", {
   td: "n-td",
   delete: "n-delete n-delete-gray",
   pages_theme: "n-pages n-pages-normal n-pages-green",
-  page_active: "n-pages-green-active"
+  page_active: "n-pages-green-active",
+  sort: "sort-green",
+  csv: "csv-button csv-button-green csv-img-green"
 })      
 
 /** Get all elements with n-table attribute and show the tables */
@@ -118,6 +126,11 @@ async function nepGetComponent(element) {
   }
   
   let title = ''
+  let sortIcon = ""
+  let applySorting = n_client_side || n_pagination === null
+  
+  if(applySorting)
+    sortIcon = `<img class="${theme.sort}" src="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/sort.svg" width="20" height="20" />`
 
   /* Get columns title */
   if(res.rows.length) {
@@ -128,8 +141,7 @@ async function nepGetComponent(element) {
       let title_column = nepGetTitle(keys[i], n_title)
       nepTableMetaData[tableId].titles.push(title_column)
       nepTableMetaData[tableId].keys.push(keys[i])
-      title += `<th class="${theme.th}">${title_column}</th>`
-      
+      title += `<th class="${theme.th}"><div><span>${title_column}</span>${sortIcon}</div></th>`
     }
   }
 
@@ -151,7 +163,7 @@ async function nepGetComponent(element) {
 
   let csvButton = ""
   if(n_csv === "true" && (n_client_side || n_pagination === null))
-    csvButton = `<div class="csv-button"><button onclick="nepDownloadCSV('${tableId}')">Download as CSV</button></div>`
+    csvButton = `<div class="${theme.csv}"><button onclick="nepDownloadCSV('${tableId}')"><img src="https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/download.svg" /></button></div>`
   else if(n_csv === "true")
     console.log("NEPTUNE: for the moment the CSV download only works when you have pull all your data")
 
@@ -175,6 +187,8 @@ async function nepGetComponent(element) {
 
   nepOnDelete(n_delete, element) // Add delete button if reuired
   nepOnUpdate(n_update, element) // Add update functionality if reuired
+  if(applySorting)
+    nepAddSorting(tableId)
 }
 
 function nepLoadSpinner(n_load_spinner) {
@@ -266,12 +280,9 @@ function nepPaginationType(res, metaData) {
     metaData.rows = res.rows
     currentRows = res.rows.slice(0, n_client_side)
   }
-  else if(metaData.urlPagination === null && metaData.n_csv === "true") {
-    console.log("sii")
+  else if(metaData.urlPagination === null && metaData.n_csv === "true")
     metaData.rows = res.rows
-  }
   
-
   return { currentRows, pageNumbers }
 }
 
@@ -388,8 +399,13 @@ async function nepDeleteRow() {
   if(res === false)
     nepShowDataError(dialog, "There was an error while deleting the row", () => nepDeleteRow())
   else {
+    if(nepTableMetaData[tableId].rows) {
+      let key = nepTableMetaData[tableId].n_key
+      nepTableMetaData[tableId].rows = nepTableMetaData[tableId].rows.filter(row => row[key] != rowKey)
+    }
     rowTr.classList.add("n-tr-remove")
     rowTr.addEventListener("transitionend", () => {
+
       rowTr.remove()
     })
     nepShowSuccess(dialog, "The row was deleted")
@@ -484,6 +500,19 @@ async function nepUpdateRow() {
     trRow.forEach((element, index) => {
       element.innerHTML = inputs[index].value
     })
+
+    if(nepTableMetaData[tableId].rows) {
+      let rows = nepTableMetaData[tableId].rows
+      let key = nepTableMetaData[tableId].n_key
+
+      for(i in rows) {
+        let row = rows[i]
+        if(row[key] == rowKey) {
+          Array.from(inputs).forEach((element, index) => row[fields[index]] = element.value)
+          break
+        }
+      }
+    }
     nepShowSuccess(dialog, "The row was updated")
   }
 }
@@ -582,15 +611,19 @@ async function nepNextServerPage(page, tableId) {
 }
 
 function nepNextClientPage(page, tableId) {
-  const n_client_side = nepTableMetaData[tableId].n_client_side // Get the number of rows to display
-  const nextPage = (page - 1) * n_client_side // Calculate the next page
-  const rows = nepTableMetaData[tableId].rows.slice(nextPage, nextPage + n_client_side) // Get the elements
+  const rows = nepRowSlice(tableId, page)
   const tableElement = document.getElementById(tableId).querySelector("tbody")
   
   // Scroll to the top and replace the tbody content with the new data
   tableElement.parentElement.scrollIntoView(true)
   const rowsTable = nepGetRows(rows, nepTableMetaData[tableId])
   tableElement.innerHTML = rowsTable
+}
+
+function nepRowSlice(tableId, page) {
+  const n_client_side = nepTableMetaData[tableId].n_client_side // Get the number of rows to display
+  const nextPage = (page - 1) * n_client_side // Calculate the next page
+  return nepTableMetaData[tableId].rows.slice(nextPage, nextPage + n_client_side) // Get the elements
 }
 
 /******** Donwload CSV ********/
@@ -623,6 +656,82 @@ function nepDownloadCSV(tableId) {
   a.setAttribute('download', 'data.csv'); 
   a.click()  
 }
+
+/***************** SORT TABLE ********************/
+function nepAddSorting(tableId) {
+  document.querySelectorAll("th").forEach(th => {
+      if(th.innerText === "Delete") return
+
+      th.classList.add("n-th-cursor") 
+      th.addEventListener("click", () => {
+      nepTableMetaData[tableId].asc = !nepTableMetaData[tableId].asc
+      const table = th.closest("table")
+
+      /** Update sort icon **/
+      Array.from(table.querySelectorAll("th")).forEach(thElement => {
+        // For the moment update all the others th elements to the default icon
+        if(th !== thElement && thElement.innerText !== "Delete") 
+          thElement.querySelector("img").src = "https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/sort.svg" 
+      })
+
+      // Update sort icon of current th
+      if(nepTableMetaData[tableId].asc)
+        th.querySelector("img").src = "https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/sort-up.svg"
+      else 
+        th.querySelector("img").src = "https://cdn.jsdelivr.net/gh/WolfVector/neptune-component/src/sort-down.svg"
+
+      const key = Array.from(th.parentNode.children).indexOf(th)
+      nepTableMetaData[tableId].rows
+        .sort(nepComparer(nepTableMetaData[tableId].keys[key], nepTableMetaData[tableId].asc))
+      
+      const tableElement = document.getElementById(tableId).querySelector("tbody")
+      
+      let rows = nepTableMetaData[tableId].rows
+      if(nepTableMetaData[tableId].n_client_side) {
+        const page = document.querySelector(".n-pages-div").querySelector('[class*="active"]').getAttribute("n-page-number")
+        rows = nepRowSlice(tableId, page)
+      }
+      const rowsTable = nepGetRows(rows, nepTableMetaData[tableId])
+    
+      tableElement.innerHTML = rowsTable
+    })
+  })
+}
+
+function nepComparer(columnIndex, asc) {
+  return function(a, b) {
+    let v1 = nepGetCellValue(asc ? a : b, columnIndex)
+    let v2 = nepGetCellValue(asc ? b : a, columnIndex)
+    const currencyRegex = /^\$[0-9]\d*(((,\d{3}){1})*(\.\d+)?)$/;
+    const dateRegex = /^\d{4}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{2}$/;
+
+    // Check for currency
+    if(currencyRegex.test(v1) && currencyRegex.test(v2)) {
+      v1 = v1.replace(/[,\$]/g, "")
+      v2 = v2.replace(/[,\$]/g, "")
+    }
+    // Check for dates with the format YYYY-Mon-DD
+    else if(dateRegex.test(v1) && dateRegex.test(v2)) {
+      let month1 = new Date(v1).getMonth() + 1
+      let month2 = new Date(v2).getMonth() + 1
+
+      v1 = v1.replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/, month1)
+      v2 = v2.replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/, month2)
+    }
+
+    // if v1 and v2 are numbers
+    if(v1 !== "" && v2 !== "" && !isNaN(v1) && !isNaN(v2))
+      return v1 - v2
+    else // if they are strings 
+      return v1.toString().localeCompare(v2)
+  }
+}
+
+function nepGetCellValue(row, index) {
+  return row[index]
+}
+
+/****************************************************/
 
 window.addEventListener("load", function(){
   nepTableComponent()

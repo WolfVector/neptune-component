@@ -18,6 +18,15 @@
     font-weight: var(--font-weight);
 }
 
+.n-th-cursor:hover {
+    cursor: pointer;
+}
+
+th div {
+    display: flex;
+    justify-content: space-between;
+}
+
 .n-th-normal {
 	background: #3D3D3D;
     color: white;
@@ -378,13 +387,72 @@ ALERTS
  .csv-button button {
     font-family: var(--font);
     font-weight: var(--font-weight);
-    font-size: 14px;
-    background-color: #6ac878;
-    color: white;
+    font-size: 10px;
     border: 0;
     border-radius: 4px;
-    padding: 7px;
+    padding: 8px;
+ }
+
+ .csv-button button:hover {
+    cursor: pointer;
+ }
+
+ .csv-button img {
+    width: 25px;
+    height: 20px;
+ }
+
+ .csv-button-normal button {
+    background-color: #3f3f3f;
+ }
+
+ .csv-img-normal img {
+    filter: brightness(0) saturate(100%) invert(85%) sepia(0%) saturate(30%) hue-rotate(298deg) brightness(110%) contrast(97%);
+ }
+
+ .csv-button-black button {
+    background-color: #3c3c3c;
+ }
+
+ .csv-img-black img {
+    filter: brightness(0) saturate(100%) invert(85%) sepia(0%) saturate(30%) hue-rotate(298deg) brightness(110%) contrast(97%);
+ }
+
+ .csv-button-gray button {
+    background-color: #e6e4e4;
+ }
+
+ .csv-img-gray img {
+    filter: brightness(0) saturate(100%) invert(15%) sepia(0%) saturate(0%) hue-rotate(136deg) brightness(103%) contrast(72%);
+ }
+
+ .csv-button-green button {
+    background-color: #32b89d;
+ }
+
+ .csv-img-green img {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(258%) hue-rotate(26deg) brightness(115%) contrast(98%);
  }
 
  /*****************/
- 
+
+ /********** SORT ICON ***********/
+
+.sort-normal {
+    filter: brightness(0) saturate(100%) invert(64%) sepia(6%) saturate(12%) hue-rotate(314deg) brightness(91%) contrast(76%);
+}
+
+.sort-black {
+    filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(972%) hue-rotate(274deg) brightness(85%) contrast(58%);
+}
+
+.sort-gray {
+    filter: brightness(0) saturate(100%) invert(78%) sepia(9%) saturate(11%) hue-rotate(324deg) brightness(102%) contrast(73%);
+}
+
+.sort-green {
+    filter: brightness(0) saturate(100%) invert(88%) sepia(91%) saturate(74%) hue-rotate(189deg) brightness(116%) contrast(86%);
+    opacity: 0.7;
+}
+
+ /******************************/

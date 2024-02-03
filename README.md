@@ -35,10 +35,11 @@ Neptune can also show **validation errors**.
 4. [Delete](#delete)
 5. [Server side Pagination](#server-pagination)
 6. [Client Side Pagination](#client-pagination)
-7. [Download as CSV](#csv-download)
-8. [Full example](#full-example)
-9. [Validation errors](#validation-errors)
-10. [Themes](#themes)
+7. [Sorting](#sorting)
+8. [Download as CSV](#csv-download)
+9. [Full example](#full-example)
+10. [Validation errors](#validation-errors)
+11. [Themes](#themes)
 
 ## Installation <a id="installation"></a>
 
@@ -222,6 +223,10 @@ With client side pagination you can pull all the data you need and add page butt
 ```
 
 With `n-client-side` you define the number of rows per page, and based on that Neptune will organize your data.}
+
+### Sorting <a id="sorting"></a>
+
+Sorting only works when you have pull all your data or when you are using client side pagination. The sorting functionality is by default.
 
 ### CSV download <a id="csv-download"></a>
 
